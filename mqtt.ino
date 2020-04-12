@@ -8,13 +8,17 @@ const char* mqttServer = "localhost";
 const int mqttPort = 1883;
 const char* mqttUser = "macuser";
 const char* mqttPassword = "macpassword";
-
+int   sensor_data;
+string converted_data;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup() {
  
+ pinMode(A0,INPUT) 
+ 
   Serial.begin(115200);
+  
  
   WiFi.begin(ssid, password);
  
@@ -43,7 +47,7 @@ void setup() {
     }
   }
  
-  client.publish("esp/test", "Hello from the other side!!");
+  client.publish("esp/test",converted_data);
   client.subscribe("esp/test");
  
 }
@@ -64,5 +68,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
  
 void loop() {
-  client.loop();
+ sensor_data= analogRead(A0);
+ sensor_data= sensor_data*1024/5; // You can scale the data according to the sensor values general
+  converted_data = sensor_data;    // formula being sensor_data= sensor_data*x/5 , x is the scale to be chosen.
+ client.loop();                      
 }
